@@ -19,9 +19,7 @@ function MediaWrap({props}: any) {
   const otherMediaRef = useRef<HTMLVideoElement>(null);
 
   const [message, setMessage] = useState("");
-  const [chatList, setChatList] = useState<
-    {[key: string]: string | undefined}[]
-  >([]);
+  const [chatList, setChatList] = useState<string[]>([]);
 
   // socket 코드 START
   useEffect(() => {
@@ -31,20 +29,15 @@ function MediaWrap({props}: any) {
       myDataChannel.current =
         myPeerConnection.current?.createDataChannel("chat")!;
       myDataChannel.current?.addEventListener("message", (event: any) => {
-        setChatList((prev) => [...prev, JSON.parse(event.data)]);
+        setChatList((prev) => [...prev, event.data]);
       });
       console.log("made data channel");
 
-      try {
-        // webRTC: create offer code
-        const offer = await myPeerConnection.current?.createOffer();
-        myPeerConnection.current?.setLocalDescription(offer);
-        console.log("sent the offer");
-        socket.emit("offer", offer, roomName);
-      } catch (error) {
-        console.log("error : ", error);
-        myPeerConnection.current?.restartIce();
-      }
+      // webRTC: create offer code
+      const offer = await myPeerConnection.current?.createOffer();
+      myPeerConnection.current?.setLocalDescription(offer);
+      console.log("sent the offer");
+      socket.emit("offer", offer, roomName);
     });
 
     // pear B
@@ -53,26 +46,16 @@ function MediaWrap({props}: any) {
       myPeerConnection.current?.addEventListener("datachannel", (event) => {
         myDataChannel.current = event.channel;
         myDataChannel.current?.addEventListener("message", (event: any) => {
-          setChatList((prev) => [...prev, JSON.parse(event.data)]);
+          setChatList((prev) => [...prev, event.data]);
         });
-        myDataChannel.current?.send(
-          JSON.stringify({
-            name: "알림",
-            message: "상대방이 입장하셨습니다.",
-          })
-        );
+        myDataChannel.current?.send("알림 : 상대방이 입장하셨습니다.");
       });
 
-      try {
-        // webRTC: receive offer code
-        myPeerConnection.current?.setRemoteDescription(offer);
-        const answer = await myPeerConnection.current?.createAnswer();
-        myPeerConnection.current?.setLocalDescription(answer);
-        socket.emit("answer", answer, roomName);
-      } catch (error) {
-        console.log("error : ", error);
-        myPeerConnection.current?.restartIce();
-      }
+      // webRTC: receive offer code
+      myPeerConnection.current?.setRemoteDescription(offer);
+      const answer = await myPeerConnection.current?.createAnswer();
+      myPeerConnection.current?.setLocalDescription(answer);
+      socket.emit("answer", answer, roomName);
     });
 
     socket.on("answer", (answer) => {
@@ -81,8 +64,13 @@ function MediaWrap({props}: any) {
     });
 
     socket.on("ice", (ice) => {
-      console.log("receive the ice");
-      myPeerConnection.current?.addIceCandidate(ice);
+      try {
+        console.log("receive the ice");
+        myPeerConnection.current?.addIceCandidate(ice);
+      } catch (error) {
+        console.log("error : ", error);
+        myPeerConnection.current?.restartIce();
+      }
     });
 
     return () => {
