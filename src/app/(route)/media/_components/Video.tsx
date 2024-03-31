@@ -169,14 +169,14 @@ export default Video;
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
+  border: 1px solid red;
+  flex: 1;
 `;
 const VideoWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  border: 1px solid gray;
 `;
 
 const MyVideo = styled.video`

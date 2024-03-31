@@ -24,7 +24,7 @@ export default function SubProvider({children}: {children: React.ReactNode}) {
           userSignInTime: user.metadata.lastSignInTime || "",
         });
         if (pathname === "/") {
-          router.replace("/main");
+          router.replace("/home");
         }
       } else {
         router.replace("/");
@@ -33,20 +33,18 @@ export default function SubProvider({children}: {children: React.ReactNode}) {
     });
   }, []);
 
-  useEffect(() => {
-    if (!userInfo) {
-      router.replace("/");
-    }
-  }, [pathname]);
-
   return (
-    <div>
+    <Wrap>
       {userInfo && <Header />}
       <ChildrenBox>{children}</ChildrenBox>
-    </div>
+    </Wrap>
   );
 }
-
+const Wrap = styled.div`
+  max-width: 600px;
+  margin: auto;
+`;
 const ChildrenBox = styled.div`
+  width: 100%;
   height: calc(100vh - var(--header-height));
 `;

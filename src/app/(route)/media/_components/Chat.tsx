@@ -1,5 +1,7 @@
+import imageUploadIcon from "@/assets/image/image-upload.svg";
 import {userInfoState} from "@/utils/atom";
-import {FormEvent, useState} from "react";
+import Image from "next/image";
+import {FormEvent, useEffect, useState} from "react";
 import {useRecoilValue} from "recoil";
 import styled from "styled-components";
 
@@ -39,13 +41,22 @@ function Chat({
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataURL = event.target?.result;
-      myDataChannel.current?.send(dataURL);
-      setChatList((prev: any) => [...prev, `${dataURL}`]);
+      try {
+        myDataChannel.current?.send(dataURL);
+        setChatList((prev: any) => [...prev, `${dataURL}`]);
+      } catch (error) {
+        alert("사진용량이 너무 크거나 지원하지 않은 타입입니다.");
+      }
     };
     reader.readAsDataURL(image);
+    setImage(undefined);
   };
 
   const dataUrlRegex = /^data:image\/\w+;base64,/;
+
+  useEffect(() => {
+    sendImageOnExistingChannel();
+  }, [image]);
 
   return (
     <ChatWrap>
@@ -60,14 +71,28 @@ function Chat({
           </div>
         ))}
       </ChatList>
-      <form onSubmit={onSubmitChat}>
-        <ChatInput
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-      </form>
-      <input type="file" onChange={handleImageChange} />
-      <button onClick={sendImageOnExistingChannel}>사진 보내기</button>
+      <SubmitWrap>
+        <form onSubmit={onSubmitChat}>
+          <ChatInput
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </form>
+        <Label htmlFor="fileInput">
+          <FileInput
+            id="fileInput"
+            type="file"
+            onChange={handleImageChange}
+            hidden
+          />
+          <Image
+            width={24}
+            height={24}
+            src={imageUploadIcon}
+            alt="image-upload-ocon"
+          />
+        </Label>
+      </SubmitWrap>
     </ChatWrap>
   );
 }
@@ -77,21 +102,36 @@ export default Chat;
 const ChatWrap = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  border: 1px solid green;
-  padding: 1rem;
-`;
-
-const ChatList = styled.div`
-  border: 1px solid red;
-  flex: 1;
-  max-width: 10rem;
-`;
-const ChatInput = styled.input`
   border: 1px solid blue;
   flex: 1;
 `;
 
+const ChatList = styled.div`
+  height: 100%;
+  padding: 0.5rem;
+  border: 1px solid red;
+`;
+
+const SubmitWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.2rem;
+`;
+const ChatInput = styled.input`
+  border: 0.1rem solid #dadada;
+  border-radius: 0.3rem;
+`;
+
+const Label = styled.label`
+  display: flex;
+  cursor: pointer;
+`;
+const FileInput = styled.input`
+  width: 100%;
+`;
+
 const Img = styled.img`
-  width: 10rem;
+  width: 100%;
 `;

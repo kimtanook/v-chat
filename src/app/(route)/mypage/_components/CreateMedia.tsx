@@ -27,9 +27,9 @@ function CreateMedia() {
 
   return (
     <div>
-      <button value={userInfo?.userName} onClick={onCreateMedia}>
+      {/* <button value={userInfo?.userName} onClick={onCreateMedia}>
         방 만들기
-      </button>
+      </button> */}
     </div>
   );
 }
