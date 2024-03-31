@@ -16,7 +16,7 @@ function Header() {
 
   const onClickSignOut = async () => {
     await signOut(authService);
-    router.push("/home");
+    router.push("/");
     alert("Success Logout!");
   };
 
