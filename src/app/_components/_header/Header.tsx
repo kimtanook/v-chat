@@ -17,7 +17,7 @@ function Header() {
   const onClickSignOut = async () => {
     await signOut(authService);
     router.push("/home");
-    alert("로그아웃 되었습니다.");
+    alert("Success Logout!");
   };
 
   return (
