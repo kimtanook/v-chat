@@ -8,9 +8,7 @@ import Video from "./Video";
 import VideoDownload from "./VideoDownload";
 
 function MediaWrap({props}: any) {
-  const socket = connect(
-    "ec2-13-209-17-74.ap-northeast-2.compute.amazonaws.com:3000"
-  );
+  const socket = connect("13.209.17.74");
 
   const roomName = props.params.id;
 
